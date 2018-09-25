@@ -2,7 +2,7 @@
 A script for better handle BLAST job on large fasta query.
 
 Highlight:
-* Automatically resume last unfinished BLAST job (reconized by output filename).
+* Automatically resume last unfinished BLAST job.
 * Periodical report the last blast progress.
 * Predict BLAST finish time (Work in progress).
 
