@@ -6,7 +6,6 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('aln_prog', help="Aln program: blasx, blastn, blastp.")
 parser.add_argument('-db', help="BLAST database name.", required=True)
-parser.add_argument('-num_threads', help="Number of thread used to BLAST.", required=True)
 parser.add_argument('-query', help="Path to fasta file.", required=True)
 parser.add_argument('-out', help="Path to blast result output.", required=True)
 parser.add_argument('-others', help="Pass other blast args.")
@@ -101,7 +100,7 @@ def blast_work(fasta_query):
 	else:
 		query_command = ' -query ' + fasta_query
 	out_command = ' -out ' + blast_output + '.tmp'
-	blast_command = args.aln_prog + ' -db ' + args.db + ' -num_threads ' + args.num_threads + query_command + out_command + ' -outfmt 6 ' + args.others
+	blast_command = args.aln_prog + ' -db ' + args.db + query_command + out_command + ' -outfmt 6 ' + args.others
 	print(blast_command)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):

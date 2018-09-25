@@ -18,7 +18,6 @@ usage: blast_batch_helper.py  aln_prog -db DB -num_threads NUM_THREADS -query QU
 required arguments:
   aln_prog            Aln program: eg. blasx, blastn, blastp.
   -db                 BLAST database name, eg. nr, swissprot.
-  -num_threads        Number of thread used to BLAST.
   -query              Path to fasta file.
   -out                Path to BLAST result output.
 
@@ -31,13 +30,12 @@ optional arguments:
 python blast_batch_helper.py \
 blastx \
 -db nr \
--num_threads 10 \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3"
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10"
 ```
 The example script will pass following command to BLAST:
-`blastx -db nr -num_threads 10 -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 `
+`blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10`
 
 When you want to continue an unfinished BLAST job, just run the script with the same arguments again. The script will look for the same output filename from `-out` argument. If the output already exists, script parses the last BLAST hit out. Then new subfasta file will be made for continuing BLAST job. All the results will be extracted and save back into the original output file.
 
