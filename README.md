@@ -39,7 +39,7 @@ blastx \
 The example script will pass following command to BLAST:
 `blastx -db nr -num_threads 10 -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 `
 
-When you want to continue an unfinished BLAST job, just run the script with same arguments again. The script will look for the same output filename from `-out` argument. If the output is already exists, script checks the last BLAST hit. Then new subfasta file will be made for continuing BLAST job. All the result will be extract and save back into original output file.
+When you want to continue an unfinished BLAST job, just run the script with the same arguments again. The script will look for the same output filename from `-out` argument. If the output already exists, script parses the last BLAST hit out. Then new subfasta file will be made for continuing BLAST job. All the results will be extracted and save back into the original output file.
 
 ## Output
 Output formate uses BLAST argument `-outfmt 6`
