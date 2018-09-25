@@ -1,5 +1,5 @@
 # BLAST-batch-helper
-A script for bettre handle BLAST job on large fasta query.
+A script for better handle BLAST job on large fasta query.
 
 Highlight:
 * Automatically resume last unfinished BLAST job (reconized by output filename).
