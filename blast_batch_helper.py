@@ -130,10 +130,13 @@ def predict_finish_time():
 		with open(blast_output+'.tmp', 'r') as f:
 			for line in f.readlines():
 				tmp_hit.append(str(line).split()[0])
-		num_finished_fasta = fasta_ids.index(tmp_hit[-1]) - fasta_ids.index(tmp_hit[0]) + 1
-		num_wait_fasta = len(fasta_ids) - fasta_ids.index(tmp_hit[-1])
-		time_spent = time.time() - time_start
-		blast_speed_per_sec = num_finished_fasta / time_spent
+		if len(tmp_hit) > 0:
+			num_finished_fasta = fasta_ids.index(tmp_hit[-1]) - fasta_ids.index(tmp_hit[0]) + 1
+			num_wait_fasta = len(fasta_ids) - fasta_ids.index(tmp_hit[-1])
+			time_spent = time.time() - time_start
+			blast_speed_per_sec = num_finished_fasta / time_spent
+		else:
+			num_finished_fasta = 0
 
 		if num_finished_fasta == 0:
 			print('Not enough hit for finish time prediction')
