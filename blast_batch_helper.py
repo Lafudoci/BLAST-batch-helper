@@ -86,9 +86,16 @@ def write_ok_mark(file_name):
 	file = open(file_name+'.ok', 'w')
 	file.close()
 
+def write_timing_mark(file_name):
+	file = open(file_name+'.timing', 'w')
+	file.write(str(time.time()))
+	file.close()
+
 def clean_tmp_file(file_name):
 	if os.path.exists(file_name+'.tmp'):
 		os.remove(file_name+'.tmp')
+	if os.path.exists(file_name+'.timing'):
+		os.remove(file_name+'.timing')
 
 def blast_work(fasta_query):
 	"""
@@ -102,15 +109,40 @@ def blast_work(fasta_query):
 	out_command = ' -out ' + blast_output + '.tmp'
 	blast_command = args.aln_prog + ' -db ' + args.db + query_command + out_command + ' -outfmt 6 ' + args.others
 	print(blast_command)
+	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
 		blast_last_result()
 		extract_blast_output()
+		predict_finish_time()
 		print('Blasting...')
 		time.sleep(20)
 	print('Blast finished')
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
+
+def predict_finish_time():
+	tmp_hit = []
+	timing_file = open(blast_output+'.timing', 'r')
+	time_start = float(timing_file.read())
+	timing_file.close()
+	if os.path.exists(blast_output+'.tmp'):
+		with open(blast_output+'.tmp', 'r') as f:
+			for line in f.readlines():
+				tmp_hit.append(str(line).split()[0])
+		num_finished_fasta = fasta_ids.index(tmp_hit[-1]) - fasta_ids.index(tmp_hit[0]) + 1
+		num_wait_fasta = len(fasta_ids) - fasta_ids.index(tmp_hit[-1])
+		time_spent = time.time() - time_start
+		blast_speed_per_sec = num_finished_fasta / time_spent
+
+		if num_finished_fasta == 0:
+			print('Not enough hit for finish time prediction')
+		else:
+			time_remaining = num_wait_fasta / blast_speed_per_sec
+			time_finish = time.time() + time_remaining
+			print('Finish time is predicted: '+ str(time.asctime(time.localtime(time_finish))))
+	else:
+		print('Not enough hit for finish time prediction')
 
 def extract_blast_output():
 	"""
