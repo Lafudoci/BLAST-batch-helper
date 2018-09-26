@@ -4,7 +4,7 @@ A script for better handle BLAST job on large fasta query.
 Highlight:
 * Automatically resume last unfinished BLAST job.
 * Periodical report the last blast progress.
-* Predict BLAST finish time (Work in progress).
+* Predict BLAST finish time.
 
 ## Requirements
 * Working [BLAST+ Command Line Applications](https://www.ncbi.nlm.nih.gov/books/NBK279671/), environment variable PATH needs to be set.
