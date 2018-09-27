@@ -8,7 +8,7 @@ Highlight:
 
 ## Requirements
 * Working [BLAST+ Command Line Applications](https://www.ncbi.nlm.nih.gov/books/NBK279671/), environment variable PATH needs to be set.
-* [BLAST database](ftp://ftp.ncbi.nlm.nih.gov/blast/db/), environment variable BLASTDB needs to be set.
+* [BLAST database](ftp://ftp.ncbi.nlm.nih.gov/blast/db/), environment variable BLASTDB needs to be set. (Not necessary when using remote BLAST)
 * Python >= 3.5
 
 ## Usage
@@ -26,6 +26,7 @@ optional arguments:
   -h, --help          Show this help message and exit
 ```
 ## Example
+### Local BLAST
 ```
 python blast_batch_helper.py \
 blastx \
@@ -34,9 +35,21 @@ blastx \
 -out fasta_all_blastx_nr.txt \
 -others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10"
 ```
-The example script will pass following command to BLAST:
+The example script will pass following command to local BLAST+:
 `blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10`
 
+### Remote BLAST
+```
+python blast_batch_helper.py \
+blastx \
+-db nr \
+-query fasta_all.fasta \
+-out fasta_all_blastx_nr.txt \
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3 -remote"
+```
+If you like to run BLAST on NCBI sever instead of your local computer, just replace the `-num_threads` with `-remote`.
+
+### Resume an unfinished BLAST
 When you want to continue an unfinished BLAST job, just run the script with the same arguments again. The script will look for the same output filename from `-out` argument. If the output already exists, script parses the last BLAST hit out. Then new subfasta file will be made for continuing BLAST job. All the results will be extracted and save back into the original output file.
 
 ## Output
