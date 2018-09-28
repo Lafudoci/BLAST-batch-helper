@@ -53,6 +53,15 @@ If you like to run BLAST on NCBI sever instead of your local computer, just repl
 When you want to continue an unfinished BLAST job, just run the script with the same arguments again. The script will look for the same output filename from `-out` argument. If the output already exists, script parses the last BLAST hit out. Then new subfasta file will be made for continuing BLAST job. All the results will be extracted and save back into the original output file.
 
 ## Output
+Shows information in blasting
+```
+Last hit: TRINITY_DN4081_c0_g1_i1
+Finished fasta: 2130
+Finished percentage: 22.50 %
+Total hits: 1554
+Finish time is predicted: Fri Oct 12 02:10:23 2018
+Blasting...
+```
 Output formate uses BLAST argument `-outfmt 6`
 ```
 TRINITY_DN89960_c0_g1_i1	F8VQB6.1	86.667	75	10	0	1	225	490	564	1.21e-027	106
