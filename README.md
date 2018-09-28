@@ -69,7 +69,7 @@ blastx \
 -gnu_parallel_b 10k \
 -gnu_parallel_j 10
 ```
-If you like to use [GNU parallel](https://www.gnu.org/software/parallel/) to speed up the local BLAST job, just add `-gnu_parallel`. You could also set `gnu_parallel_b` and `gnu_parallel_j` to fit your condition. Note if the `-num_threads` isn't set here, then it will be default value: 1 from BLAST+.
+If you like to use [GNU parallel](https://www.gnu.org/software/parallel/) to speed up the local BLAST job, just add `-gnu_parallel`. You could also set `gnu_parallel_b` and `gnu_parallel_j` to fit your condition.
 
 ## Output
 Shows information in blasting
