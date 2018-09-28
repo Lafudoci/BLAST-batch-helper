@@ -13,7 +13,7 @@ Highlight:
 
 ## Usage
 ```
-usage: blast_batch_helper.py  aln_prog -db DB -num_threads NUM_THREADS -query QUERY -out OUT [-others OTHERS] [-h]
+usage: blast_batch_helper.py  aln_prog -db DB -query QUERY -out OUT [-others OTHERS] [-h]
 
 required arguments:
   aln_prog            Aln program: eg. blasx, blastn, blastp.
