@@ -35,7 +35,7 @@ def parse_blast_id():
 			for line in f.readlines():
 				blast_ids.append(str(line).split('\t')[0])
 	else:
-		print('No Blast output yet. Skipping parse.')
+		print('No BLAST output yet. Skipping parse.')
 
 	return blast_ids
 
@@ -70,7 +70,7 @@ def prepare_subfasta():
 			os.remove(subfasta_file)
 			print('Remove old duplicate subfasta file.')
 		
-		print('Blast+ will start from: '+ start_id + '\nGenerating subfasta file... It may take a while.')
+		print('BLAST+ will start from: '+ start_id + '\nGenerating subfasta file... It may take a while.')
 		subfile = False
 		with open (fasta_file, 'r') as f:
 			for line in f.readlines():
@@ -82,7 +82,7 @@ def prepare_subfasta():
 					file.close()
 		return 'id_' + start_id
 	else:
-		print('Blast+ will start from origin fasta file')
+		print('BLAST+ will start from origin fasta file')
 		return fasta_file
 
 def write_ok_mark(file_name):
@@ -125,9 +125,9 @@ def blast_work(fasta_query):
 		extract_blast_output()
 		blast_last_result()
 		predict_finish_time()
-		print('Blasting...\n')
+		print('BLASTing...\n')
 		time.sleep(20)
-	print('Blast finished')
+	print('BLAST finished')
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
 
@@ -153,6 +153,7 @@ def predict_finish_time():
 		else:
 			time_remaining = num_wait_fasta / blast_speed_per_sec
 			time_finish = time.time() + time_remaining
+			print('Current BLASTing speed: %d seqs/hour.' % int(blast_speed_per_sec*3600))
 			print('Finish time is predicted: '+ str(time.asctime(time.localtime(time_finish))))
 	else:
 		print('Not enough hit for finish time prediction')
@@ -171,7 +172,7 @@ def extract_blast_output():
 					file = open(blast_output, 'a')
 					file.write(line)
 					file.close()
-					print('New hit: '+ result[0] + ' ' + result[1])
+					# print('New hit: '+ result[0] + ' ' + result[1])
 	else:
 		print('No Blast output yet. Skipping extraction.')
 
@@ -185,7 +186,7 @@ def main():
 			parse_fasta()
 			blast_work(prepare_subfasta())
 	else:
-		print(blast_output + ' does not exist.\nStarting Blast+ work')
+		print(blast_output + ' does not exist.\nStarting BLAST+ work')
 		parse_fasta()
 		blast_work(fasta_file)
 
