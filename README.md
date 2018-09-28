@@ -38,10 +38,10 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6 -num_threads 10"
+-others "-task blastx-fast -evalue 1e-6 -num_threads 10"
 ```
 The example script will pass following command to local BLAST+:
-`blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10`
+`blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -evalue 1e-6 -num_threads 10`
 
 ### Remote BLAST
 ```
@@ -50,7 +50,7 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6 -remote"
+-others "-task blastx-fast -evalue 1e-6 -remote"
 ```
 If you like to run BLAST on NCBI sever instead of your local computer, just replace the `-num_threads` with `-remote`.
 
@@ -64,7 +64,7 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6"
+-others "-task blastx-fast -evalue 1e-6"
 -gnu_parallel \
 -gnu_parallel_b 10k \
 -gnu_parallel_j 10
