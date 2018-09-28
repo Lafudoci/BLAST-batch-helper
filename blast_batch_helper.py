@@ -115,7 +115,7 @@ def blast_work(fasta_query):
 		gnu_parallel_args = "parallel --no-notice --recstart '>' --block %s --pipe" % (args.gnu_parallel_b)
 		if args.gnu_parallel_j:
 			gnu_parallel_args = '%s -j %s' % (gnu_parallel_args, args.gnu_parallel_j)
-		blast_command = "cat %s | parallel --no-notice --block 10k --recstart '>' --pipe %s -db %s -outfmt 6 %s -query -> %s" % (query_command[7:], args.aln_prog, args.db, args.others, out_command[5:])
+		blast_command = "cat %s | %s %s -db %s -outfmt 6 %s -query -> %s" % (query_command[7:], gnu_parallel_args, args.aln_prog, args.db, args.others, out_command[5:])
 	else:
 		blast_command = '%s -db %s %s %s -outfmt 6 %s' % (args.aln_prog, args.db, query_command, out_command, args.others)
 	print('Executing: ' + blast_command)
