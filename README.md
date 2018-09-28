@@ -38,7 +38,7 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10"
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6 -num_threads 10"
 ```
 The example script will pass following command to local BLAST+:
 `blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -max_target_seqs 1 -evalue 1e-3 -num_threads 10`
@@ -50,7 +50,7 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3 -remote"
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6 -remote"
 ```
 If you like to run BLAST on NCBI sever instead of your local computer, just replace the `-num_threads` with `-remote`.
 
@@ -64,7 +64,7 @@ blastx \
 -db nr \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
--others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3"
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-6"
 -gnu_parallel \
 -gnu_parallel_b 10k \
 -gnu_parallel_j 10
@@ -74,12 +74,13 @@ If you like to use [GNU parallel](https://www.gnu.org/software/parallel/) to spe
 ## Output
 Shows information in blasting
 ```
-Total hits: 1559
-Last hit: TRINITY_DN4081_c0_g1_i10
-Finished fasta: 2134
-Finished percentage: 22.54 % (2134/9468)
-Finish time is predicted: Fri Oct 12 02:10:23 2018
-Blasting...
+Total hits: 4082
+Last hit: TRINITY_DN98557_c0_g1_i1
+Finished fasta: 5088
+Finished percentage: 53.74 % (5088/9468)
+Current BLASTing speed: 49 seqs/hour.
+Finish time is predicted: Tue Oct  2 12:22:54 2018
+BLASTing...
 ```
 Output formate uses BLAST argument `-outfmt 6`
 ```
