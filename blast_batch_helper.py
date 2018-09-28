@@ -31,7 +31,6 @@ def parse_blast_id():
 		with open (blast_output, 'r') as f:
 			for line in f.readlines():
 				blast_ids.append(str(line).split('\t')[0])
-		print('Total hits: '+ str(len(blast_ids)))
 	else:
 		print('No Blast output yet. Skipping parse.')
 
@@ -44,13 +43,14 @@ def blast_last_result():
 	"""
 	blast_ids = parse_blast_id()
 	if len(blast_ids) > 0 :
+		print('Total hits: '+ str(len(blast_ids)))
 		print('Last hit: '+blast_ids[-1])
 		finished_fasta = fasta_ids.index(blast_ids[-1])+1
 	else:
 		finished_fasta = 0
 		return -1
 	print('Finished fasta: '+ str(finished_fasta))
-	print('Finished percentage: %.02f %%' % (finished_fasta/len(fasta_ids)*100))
+	print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
 	return blast_ids[-1]
 
 def prepare_subfasta():
@@ -115,7 +115,7 @@ def blast_work(fasta_query):
 		blast_last_result()
 		extract_blast_output()
 		predict_finish_time()
-		print('Blasting...')
+		print('Blasting...\n')
 		time.sleep(20)
 	print('Blast finished')
 	write_ok_mark(blast_output)

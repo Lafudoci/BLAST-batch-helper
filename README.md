@@ -55,10 +55,10 @@ When you want to continue an unfinished BLAST job, just run the script with the 
 ## Output
 Shows information in blasting
 ```
-Last hit: TRINITY_DN4081_c0_g1_i1
-Finished fasta: 2130
-Finished percentage: 22.50 %
-Total hits: 1554
+Total hits: 1559
+Last hit: TRINITY_DN4081_c0_g1_i10
+Finished fasta: 2134
+Finished percentage: 22.54 % (2134/9468)
 Finish time is predicted: Fri Oct 12 02:10:23 2018
 Blasting...
 ```
