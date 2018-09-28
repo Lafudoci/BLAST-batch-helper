@@ -30,6 +30,8 @@ optional arguments:
   -gnu_parallel_j     Set GNU parallel job number.  
   -h, --help          Show this help message and exit
 ```
+Please note that `-outfmt 6` is hard coded in script, so do NOT include `-outfmt` in `-others`.
+
 ## Example
 ### Local BLAST
 ```
