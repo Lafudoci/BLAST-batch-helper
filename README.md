@@ -5,6 +5,7 @@ Highlight:
 * Automatically resume last unfinished BLAST job.
 * Periodical report the last blast progress.
 * Predict BLAST finish time.
+* [NEW] Compatible with GNU parallel.
 
 ## Requirements
 * Working [BLAST+ Command Line Applications](https://www.ncbi.nlm.nih.gov/books/NBK279671/), environment variable PATH needs to be set.
@@ -22,7 +23,10 @@ required arguments:
   -out                Path to BLAST result output.
 
 optional arguments:
-  -others OTHERS      Pass other BLAST args.
+  -others             Pass other BLAST args.
+  -gnu_parallel       Use GNU parallel.
+  -gnu_parallel_b     Set GNU parallel block size (Default is 100k).
+  -gnu_parallel_j     Set GNU parallel job number.  
   -h, --help          Show this help message and exit
 ```
 ## Example
@@ -51,6 +55,20 @@ If you like to run BLAST on NCBI sever instead of your local computer, just repl
 
 ### Resume an unfinished BLAST
 When you want to continue an unfinished BLAST job, just run the script with the same arguments again. The script will look for the same output filename from `-out` argument. If the output already exists, script parses the last BLAST hit out. Then new subfasta file will be made for continuing BLAST job. All the results will be extracted and save back into the original output file.
+
+### Use GNU parallel (Optional)
+```
+python3 blast_batch_helper.py \
+blastx \
+-db nr \
+-query fasta_all.fasta \
+-out fasta_all_blastx_nr.txt \
+-others "-task blastx-fast -max_target_seqs 1 -evalue 1e-3"
+-gnu_parallel \
+-gnu_parallel_b 10k \
+-gnu_parallel_j 10
+```
+If you like to use [GNU parallel](https://www.gnu.org/software/parallel/) to speed up the BLAST job, just add `-gnu_parallel`. You could also set `gnu_parallel_b` and `gnu_parallel_j` to fit your condition. Note if the `-num_threads` isn't set here, then it will be default value: 1 from BLAST+.
 
 ## Output
 Shows information in blasting
