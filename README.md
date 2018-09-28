@@ -11,6 +11,7 @@ Highlight:
 * Working [BLAST+ Command Line Applications](https://www.ncbi.nlm.nih.gov/books/NBK279671/), environment variable PATH needs to be set.
 * [BLAST database](ftp://ftp.ncbi.nlm.nih.gov/blast/db/), environment variable BLASTDB needs to be set. (Not necessary when using remote BLAST)
 * Python >= 3.5
+* [GNU parallel](https://www.gnu.org/software/parallel/) (optional) 
 
 ## Usage
 ```
