@@ -112,8 +112,8 @@ def blast_work(fasta_query):
 	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
-		blast_last_result()
 		extract_blast_output()
+		blast_last_result()
 		predict_finish_time()
 		print('Blasting...\n')
 		time.sleep(20)
