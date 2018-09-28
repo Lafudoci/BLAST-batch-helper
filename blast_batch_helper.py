@@ -8,6 +8,9 @@ parser.add_argument('aln_prog', help="Aln program: blasx, blastn, blastp.")
 parser.add_argument('-db', help="BLAST database name.", required=True)
 parser.add_argument('-query', help="Path to fasta file.", required=True)
 parser.add_argument('-out', help="Path to blast result output.", required=True)
+parser.add_argument('-gnu_parallel', help="Use GNU parallel.", action='store_true', required=False)
+parser.add_argument('-gnu_parallel_b', help="Set GNU parallel block size.", default= '100k', required=False)
+parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",required=False)
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
@@ -103,12 +106,19 @@ def blast_work(fasta_query):
 	"""
 	clean_tmp_file(blast_output)
 	if fasta_query.startswith('id_'):
-		query_command = ' -query ' + fasta_file + '.from_' + fasta_query[3:] + '.fasta'
+		query_command = '-query %s.from_%s.fasta' % (fasta_file, fasta_query[3:])
 	else:
-		query_command = ' -query ' + fasta_query
-	out_command = ' -out ' + blast_output + '.tmp'
-	blast_command = args.aln_prog + ' -db ' + args.db + query_command + out_command + ' -outfmt 6 ' + args.others
-	print(blast_command)
+		query_command = '-query %s' % (fasta_query)
+	out_command = '-out %s.tmp' % (blast_output)
+	if args.gnu_parallel == True:
+		print('\nGNU parallel is enabled. The statement from authors:\nWhen using programs that use GNU Parallel to process data for publication please cite:\nO. Tange (2011): GNU Parallel - The Command-Line Power Tool,\n;login: The USENIX Magazine, February 2011:42-47.\n')
+		gnu_parallel_args = "parallel --no-notice --recstart '>' --block %s --pipe" % (args.gnu_parallel_b)
+		if args.gnu_parallel_j:
+			gnu_parallel_args = '%s -j %s' % (gnu_parallel_args, args.gnu_parallel_j)
+		blast_command = "cat %s | parallel --no-notice --block 10k --recstart '>' --pipe %s -db %s -outfmt 6 %s -query -> %s" % (query_command[7:], args.aln_prog, args.db, args.others, out_command[5:])
+	else:
+		blast_command = '%s -db %s %s %s -outfmt 6 %s' % (args.aln_prog, args.db, query_command, out_command, args.others)
+	print('Executing: ' + blast_command)
 	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
