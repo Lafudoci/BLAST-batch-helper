@@ -128,6 +128,7 @@ def blast_work(fasta_query):
 		print('BLASTing...\n')
 		time.sleep(20)
 	print('BLAST finished')
+	extract_blast_output()	# extract the remaining hits after BLAST finish
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
 
