@@ -33,7 +33,13 @@ def parse_blast_id():
 	if os.path.exists(blast_output):
 		with open (blast_output, 'r') as f:
 			for line in f.readlines():
-				blast_ids.append(str(line).split('\t')[0])
+				hit_line = str(line).strip().split('\t')
+				if len(hit_line) == 12:
+					blast_ids.append(str(line).split('\t')[0])
+				else:
+					print('\nERROR: Invalid hit in ouputfile:\n'+ str(line))
+					print('Please check if the ouputfile is in default fmt6 format')
+					raise SystemExit(0)
 	else:
 		print('No BLAST output yet. Skipping parse.')
 
