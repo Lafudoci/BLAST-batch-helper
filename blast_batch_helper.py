@@ -14,6 +14,7 @@ parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",requi
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
+version = '0.4.0'
 
 fasta_file = args.query
 blast_output = args.out
@@ -194,6 +195,7 @@ def extract_blast_output(arg):
 		print('No Blast output yet. Skipping extraction.')
 
 def main():
+	print('\nBLAST-batch-helper v%s\n'%(version))
 	if os.path.exists(blast_output):
 		print(blast_output + ' exists.')
 		if os.path.exists(blast_output+'.ok'):
