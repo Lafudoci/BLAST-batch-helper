@@ -14,7 +14,7 @@ parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",requi
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
-version = '0.4.0'
+version = '0.4.1'
 
 fasta_file = args.query
 blast_output = args.out
@@ -44,6 +44,18 @@ def parse_blast_id():
 	else:
 		print('No BLAST output yet. Skipping parse.')
 	return blast_ids
+
+def parse_tmp_id():
+	tmp_ids = []
+	if os.path.exists(blast_output+'.tmp'):
+		with open (blast_output+'.tmp', 'r') as f:
+			for line in f.readlines():
+				hit_line = str(line).strip().split('\t')
+				if len(hit_line) == 12:
+					tmp_ids.append(hit_line[0])
+	else:
+		print('No BLAST tmp yet. Skipping parse.')
+	return tmp_ids
 
 def blast_last_result():
 	"""
@@ -139,14 +151,11 @@ def blast_work(fasta_query):
 	clean_tmp_file(blast_output)
 
 def predict_finish_time():
-	tmp_hit = []
 	timing_file = open(blast_output+'.timing', 'r')
 	time_start = float(timing_file.read())
 	timing_file.close()
 	if os.path.exists(blast_output+'.tmp'):
-		with open(blast_output+'.tmp', 'r') as f:
-			for line in f.readlines():
-				tmp_hit.append(str(line).split()[0])
+		tmp_hit = parse_tmp_id()
 		if len(tmp_hit) > 0:
 			num_finished_fasta = fasta_ids.index(tmp_hit[-1]) - fasta_ids.index(tmp_hit[0]) + 1
 			num_wait_fasta = len(fasta_ids) - fasta_ids.index(tmp_hit[-1])
@@ -171,10 +180,7 @@ def extract_blast_output(arg):
 	"""
 	if os.path.exists(blast_output+'.tmp'):
 		existing_id = parse_blast_id()
-		tmp_existing_id = []
-		with open (blast_output+'.tmp', 'r') as f:	# Build query id list from tmp file
-			for line in f.readlines():
-				tmp_existing_id.append(line.split('\t')[0])		
+		tmp_existing_id = parse_tmp_id()	# Build query id list from tmp file
 		with open (blast_output+'.tmp', 'r') as f:	# Extract hit from tmp file
 			for line in f.readlines():
 				result = line.split('\t')
