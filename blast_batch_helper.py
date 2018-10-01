@@ -128,13 +128,13 @@ def blast_work(fasta_query):
 	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
-		extract_blast_output()
+		extract_blast_output('tmp')
 		blast_last_result()
 		predict_finish_time()
 		print('BLASTing...\n')
 		time.sleep(20)
 	print('BLAST finished')
-	extract_blast_output()	# extract the remaining hits after BLAST finish
+	extract_blast_output('final')	# extract the remaining hits after BLAST finish
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
 
@@ -165,21 +165,31 @@ def predict_finish_time():
 	else:
 		print('Not enough hit for finish time prediction')
 
-def extract_blast_output():
+def extract_blast_output(arg):
 	"""
 	Extract blast result from tmp file to blast_output file.
 	"""
 	if os.path.exists(blast_output+'.tmp'):
 		existing_id = parse_blast_id()
-		with open (blast_output+'.tmp', 'r') as f:
+		tmp_existing_id = []
+		with open (blast_output+'.tmp', 'r') as f:	# Build query id list from tmp file
 			for line in f.readlines():
-				result = []
-				result = line.split()
-				if (result[0] not in existing_id):
-					file = open(blast_output, 'a')
-					file.write(line)
-					file.close()
-					# print('New hit: '+ result[0] + ' ' + result[1])
+				tmp_existing_id.append(line.split('\t')[0])		
+		with open (blast_output+'.tmp', 'r') as f:	# Extract hit from tmp file
+			for line in f.readlines():
+				result = line.split('\t')
+				if arg == 'tmp':
+					if (result[0] not in existing_id and result[0] != tmp_existing_id[-1]):	# Don't extract current query to avoid incomplete BLAST hit
+						file = open(blast_output, 'a')
+						file.write(line)
+						file.close()
+				elif arg == 'final':
+					if (result[0] not in existing_id):	# Extract all the new query
+						file = open(blast_output, 'a')
+						file.write(line)
+						file.close()
+				else:
+					print('ERROR: unknow arg of extract_blast_output: '+arg)
 	else:
 		print('No Blast output yet. Skipping extraction.')
 
