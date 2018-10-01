@@ -14,7 +14,7 @@ parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",requi
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
-version = '0.4.1'
+version = '0.5.0'
 
 fasta_file = args.query
 blast_output = args.out
@@ -185,10 +185,13 @@ def extract_blast_output(arg):
 			for line in f.readlines():
 				result = line.split('\t')
 				if arg == 'tmp':
-					if (result[0] not in existing_id and result[0] != tmp_existing_id[-1]):	# Don't extract current query to avoid incomplete BLAST hit
-						file = open(blast_output, 'a')
-						file.write(line)
-						file.close()
+					if (result[0] not in existing_id):
+						if result[0] == tmp_existing_id[-1]:	# Stop at current query to avoid incomplete BLAST hit
+							break
+						else:
+							file = open(blast_output, 'a')
+							file.write(line)
+							file.close()
 				elif arg == 'final':
 					if (result[0] not in existing_id):	# Extract all the new query
 						file = open(blast_output, 'a')
