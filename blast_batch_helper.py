@@ -43,7 +43,6 @@ def parse_blast_id():
 					raise SystemExit(0)
 	else:
 		print('No BLAST output yet. Skipping parse.')
-
 	return blast_ids
 
 def blast_last_result():
@@ -192,16 +191,16 @@ def extract_blast_output(arg):
 				else:
 					print('ERROR: unknow arg of extract_blast_output: '+arg)
 	else:
-		print('No Blast output yet. Skipping extraction.')
+		print('No BLAST output yet. Skipping extraction.')
 
 def main():
 	print('\nBLAST-batch-helper v%s\n'%(version))
 	if os.path.exists(blast_output):
 		print(blast_output + ' exists.')
 		if os.path.exists(blast_output+'.ok'):
-			print('Blast+ work was already finished.')
+			print('BLAST+ work was already finished.')
 		else:
-			print('Last Blast+ work was not finished.\nContinuing Blast+ work')
+			print('Last BLAST+ work was not finished.\nContinuing BLAST+ work')
 			parse_fasta()
 			blast_work(prepare_subfasta())
 	else:
