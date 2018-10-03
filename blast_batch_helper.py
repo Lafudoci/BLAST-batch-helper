@@ -14,22 +14,28 @@ parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",requi
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
-version = '0.5.0'
+version = '0.6.0'
 
 fasta_file = args.query
 blast_output = args.out
 
 fasta_ids = []
 
-def parse_fasta():
+def parse_fasta_id():
+	"""
+	Parse fasta and keep query ids in global fasta_ids
+	"""
+	global fasta_ids
 	with open (fasta_file, 'r') as f:
 		for line in f.readlines():
 			if line.startswith('>'):
-				fasta_ids.append(line.split(' ')[0][1:])
+				fasta_ids.append(line.split()[0][1:])
 	print('Total fasta counts: '+ str(len(fasta_ids)))
-	return fasta_ids
 
 def parse_blast_id():
+	"""
+	Parse blast and output hits ids list
+	"""
 	blast_ids = []
 	if os.path.exists(blast_output):
 		with open (blast_output, 'r') as f:
@@ -39,13 +45,46 @@ def parse_blast_id():
 					blast_ids.append(str(line).split('\t')[0])
 				else:
 					print('\nERROR: Invalid hit in ouputfile:\n'+ str(line))
-					print('Please check if the ouputfile is in default fmt6 format')
+					print('Please check if the ouputfile is in default fmt6 format. Or it contains incomplete hits.')
 					raise SystemExit(0)
 	else:
 		print('No BLAST output yet. Skipping parse.')
 	return blast_ids
 
+def finish_and_unfinished_id():
+	"""
+	Output finish and unfinished query ids list
+	"""
+	finish_ids = []
+	re_check_ids = []
+	no_hit_ids = []
+	unfinished_ids = []
+	blast_ids = parse_blast_id()
+	blast_ids_set = set(blast_ids)	# use set to speed up
+	for query in fasta_ids:
+		if query in blast_ids_set:
+			finish_ids.append(query)
+		else:
+			no_hit_ids.append(query)
+	
+	if len(finish_ids)>0:
+		last_hit_index = fasta_ids.index(finish_ids[-1])
+	else:
+		last_hit_index = 0
+	
+	for no_hit in no_hit_ids:
+		if fasta_ids.index(no_hit)<last_hit_index:
+			re_check_ids.append(no_hit)
+		else:
+			unfinished_ids.append(no_hit)
+
+	# print('finish_ids:%d\nre_check_ids:%d\nunfinished_ids:%d'% (len(finish_ids), len(re_check_ids), len(unfinished_ids)))
+	return finish_ids, re_check_ids, unfinished_ids
+
 def parse_tmp_id():
+	"""
+	Parse blast tmp file and output only complete hit's id in a list
+	"""
 	tmp_ids = []
 	if os.path.exists(blast_output+'.tmp'):
 		with open (blast_output+'.tmp', 'r') as f:
@@ -57,43 +96,50 @@ def parse_tmp_id():
 		print('No BLAST tmp yet. Skipping parse.')
 	return tmp_ids
 
-def blast_last_result():
+def last_blast_result():
 	"""
-	Check last blast result from parse_blast_id() and return last hit id
-	Return -1 if there is no result yet
+	Check last blast result from finish_and_unfinished_id().
+	Return -1 if there is no result yet.
 	"""
-	blast_ids = parse_blast_id()
-	if len(blast_ids) > 0 :
-		print('Total hits: '+ str(len(blast_ids)))
-		print('Last hit: '+blast_ids[-1])
-		finished_fasta = fasta_ids.index(blast_ids[-1])+1
+	finish_ids, re_check_ids, unfinished_ids = finish_and_unfinished_id()
+	if len(finish_ids) > 0 :
+		finished_fasta = fasta_ids.index(finish_ids[-1])+1
+		print('Last hit: %s (at No.%d query)'% (finish_ids[-1], fasta_ids.index(finish_ids[-1])+1))
+		print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
 	else:
 		finished_fasta = 0
 		return -1
-	print('Finished fasta: '+ str(finished_fasta))
-	print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
-	return blast_ids[-1]
 
 def prepare_subfasta():
 	"""
-	Prepare sub fasta file from unfinished work for continuing blasting job
+	Prepare sub fasta file from unfinished work & query w/o any hit for continuing blasting job
 	Return the starting id of fasta file (str starts from id_)
 	Return origin fasta file path if there is no result yet
 	"""
-	last_hit = blast_last_result()
-	if last_hit != -1:
-		start_id = fasta_ids[fasta_ids.index(last_hit)+1]
+	finish_ids, re_check_ids, unfinished_ids = finish_and_unfinished_id()
+	print('\nQuery w/  hit counts: '+ str(len(finish_ids)))
+	print('Query w/o hit counts: '+ str(len(re_check_ids)+len(unfinished_ids)))
+	
+	if len(finish_ids) > 0:
+		last_hit = finish_ids[-1]
+		if len(unfinished_ids) > 0:
+			start_id = unfinished_ids[0]
+		else:
+			start_id = last_hit
 		subfasta_file = fasta_file+'.from_'+start_id+'.fasta'
 		if os.path.exists(subfasta_file):
 			os.remove(subfasta_file)
 			print('Remove old duplicate subfasta file.')
 		
-		print('BLAST+ will start from: '+ start_id + '\nGenerating subfasta file... It may take a while.')
+		print('\nLast BLAST+ stopped at '+ start_id + '\nBut ALL query w/o hit before it will run BLAST again.\nGenerating subfasta file... It may take a while.\n')
 		subfile = False
 		with open (fasta_file, 'r') as f:
 			for line in f.readlines():
-				if line.startswith('>'+start_id):
-					subfile = True
+				if line[0] == '>':
+					if line.split()[0][1:] in re_check_ids or line.split()[0][1:] in unfinished_ids:
+						subfile = True
+					else:
+						subfile = False
 				if subfile == True:
 					file = open(subfasta_file, 'a')
 					file.write(line)
@@ -141,11 +187,11 @@ def blast_work(fasta_query):
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
 		extract_blast_output('tmp')
-		blast_last_result()
+		last_blast_result()
 		predict_finish_time()
 		print('BLASTing...\n')
 		time.sleep(20)
-	print('BLAST finished')
+	print('BLAST finished. Extracting final results.')
 	extract_blast_output('final')	# extract the remaining hits after BLAST finish
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
@@ -157,8 +203,11 @@ def predict_finish_time():
 	if os.path.exists(blast_output+'.tmp'):
 		tmp_hit = parse_tmp_id()
 		if len(tmp_hit) > 0:
-			num_finished_fasta = fasta_ids.index(tmp_hit[-1]) - fasta_ids.index(tmp_hit[0]) + 1
-			num_wait_fasta = len(fasta_ids) - fasta_ids.index(tmp_hit[-1])
+			tmp_index_list = []
+			for hit in tmp_hit:
+				tmp_index_list.append(fasta_ids.index(hit))
+			num_finished_fasta = max(tmp_index_list)-min(tmp_index_list)+1
+			num_wait_fasta = len(fasta_ids) - max(tmp_index_list)
 			time_spent = time.time() - time_start
 			blast_speed_per_sec = num_finished_fasta / time_spent
 		else:
@@ -210,11 +259,11 @@ def main():
 			print('BLAST+ work was already finished.')
 		else:
 			print('Last BLAST+ work was not finished.\nContinuing BLAST+ work')
-			parse_fasta()
+			parse_fasta_id()
 			blast_work(prepare_subfasta())
 	else:
 		print(blast_output + ' does not exist.\nStarting BLAST+ work')
-		parse_fasta()
+		parse_fasta_id()
 		blast_work(fasta_file)
 
 
