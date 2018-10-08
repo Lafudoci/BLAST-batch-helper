@@ -15,12 +15,11 @@ parser.add_argument('-others', help="Pass other blast args.")
 parser.add_argument('-no_rollback', help="Ignore previous queries w/o hit in a resuming job.", action='store_true', required=False)
 args = parser.parse_args()
 
-version = '0.7.2'
+version = '0.7.3'
 
 fasta_file = args.query
 blast_output = args.out
 check_interval = 20
-nowtime = time.strftime('[%Y/%m/%d %H:%M:%S]')
 
 fasta_ids = []
 
@@ -201,7 +200,7 @@ def blast_work(fasta_query):
 	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
-		print('\n%s\nCheck BLAST status...'% nowtime)
+		print('\n%s\nCheck BLAST status...'% time.strftime('[%Y/%m/%d %H:%M:%S]'))
 		extract_blast_output('tmp')
 		last_blast_result()
 		predict_finish_time()
@@ -211,7 +210,7 @@ def blast_work(fasta_query):
 	extract_blast_output('final')	# extract the remaining hits after BLAST finish
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
-	print('\n%s\nBLAST job is done.'% nowtime)
+	print('\n%s\nBLAST job is done.'% time.strftime('[%Y/%m/%d %H:%M:%S]'))
 
 def predict_finish_time():
 	timing_file = open(blast_output+'.timing', 'r')
