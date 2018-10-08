@@ -27,7 +27,8 @@ optional arguments:
   -others             Pass other BLAST args.
   -gnu_parallel       Use GNU parallel.
   -gnu_parallel_b     Set GNU parallel block size (Default is 100k).
-  -gnu_parallel_j     Set GNU parallel job number.  
+  -gnu_parallel_j     Set GNU parallel job number.
+  -no_rollback        Ignore previous queries w/o hit in a resuming job.  
   -h, --help          Show this help message and exit
 ```
 Please note that `-outfmt 6` is hard coded in script, so do NOT include `-outfmt` in `-others`.
@@ -37,21 +38,21 @@ Please note that `-outfmt 6` is hard coded in script, so do NOT include `-outfmt
 ```
 python blast_batch_helper.py \
 blastx \
--db nr \
+-db swissprot \
 -query fasta_all.fasta \
--out fasta_all_blastx_nr.txt \
+-out fasta_all_blastx_swissprot.fmt6 \
 -others "-task blastx-fast -evalue 1e-6 -num_threads 10"
 ```
 The example script will pass following command to local BLAST+:
-`blastx -db nr -query fasta_all.fasta -out fasta_all_blastx_nr.txt -outfmt 6 -task blastx-fast -evalue 1e-6 -num_threads 10`
+`blastx -db swissprot -query fasta_all.fasta -out fasta_all_blastx_swissprot.txt -outfmt 6 -task blastx-fast -evalue 1e-6 -num_threads 10`
 
 ### Remote BLAST
 ```
 python blast_batch_helper.py \
 blastx \
--db nr \
+-db swissprot \
 -query fasta_all.fasta \
--out fasta_all_blastx_nr.txt \
+-out fasta_all_blastx_swissprot.fmt6 \
 -others "-task blastx-fast -evalue 1e-6 -remote"
 ```
 If you like to run BLAST on NCBI sever instead of your local computer, just replace the `-num_threads` with `-remote`.
@@ -63,7 +64,7 @@ When you want to continue an unfinished BLAST job, just run the script with the 
 ```
 python3 blast_batch_helper.py \
 blastx \
--db nr \
+-db swissprot \
 -query fasta_all.fasta \
 -out fasta_all_blastx_nr.txt \
 -others "-task blastx-fast -evalue 1e-6"
@@ -76,13 +77,13 @@ If you like to use [GNU parallel](https://www.gnu.org/software/parallel/) to spe
 ## Output
 Shows information in blasting
 ```
-Total hits: 4082
-Last hit: TRINITY_DN98557_c0_g1_i1
-Finished fasta: 5088
-Finished percentage: 53.74 % (5088/9468)
-Current BLASTing speed: 49 seqs/hour.
-Finish time is predicted: Tue Oct  2 12:22:54 2018
-BLASTing...
+[2018/10/08 17:37:48]
+Check BLAST status...
+Last hit: TRINITY_DN2431_c1_g1_i2
+Finished percentage: 0.88 % (83/9468)
+Current BLASTing speed: 3596 seqs/hour.
+Finish time is predicted: 2018/10/08 20:14:06
+BLASTing...update in 20 secs.
 ```
 Output formate uses BLAST argument `-outfmt 6`
 ```
