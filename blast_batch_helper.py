@@ -202,12 +202,13 @@ def predict_finish_time():
 	timing_file.close()
 	if os.path.exists(blast_output+'.tmp'):
 		tmp_hit = parse_tmp_id()
-		if len(tmp_hit) > 0:
-			tmp_index_list = []
-			for hit in tmp_hit:
-				tmp_index_list.append(fasta_ids.index(hit))
-			num_finished_fasta = max(tmp_index_list)-min(tmp_index_list)+1
-			num_wait_fasta = len(fasta_ids) - max(tmp_index_list)
+		tmp_hit_set = set(tmp_hit)
+		if len(tmp_hit_set) > 0:
+			tmp_index_set = set()
+			for hit in tmp_hit_set:
+				tmp_index_set.add(fasta_ids.index(hit))
+			num_finished_fasta = max(tmp_index_set)-min(tmp_index_set)+1
+			num_wait_fasta = len(fasta_ids) - max(tmp_index_set)
 			time_spent = time.time() - time_start
 			blast_speed_per_sec = num_finished_fasta / time_spent
 		else:
