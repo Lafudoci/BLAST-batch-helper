@@ -44,7 +44,7 @@ def parse_blast_id():
 			for line in f.readlines():
 				hit_line = str(line).strip().split('\t')
 				if len(hit_line) == 12:
-					blast_ids.append(str(line).split('\t')[0])
+					blast_ids.append(hit_line[0])
 				else:
 					print('\nERROR: Invalid hit in ouputfile:\n'+ str(line))
 					print('Please check if the ouputfile is in default fmt6 format. Or it contains incomplete hits.')
