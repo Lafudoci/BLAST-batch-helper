@@ -98,17 +98,15 @@ def parse_tmp_id():
 
 def last_blast_result():
 	"""
-	Check last blast result from finish_and_unfinished_id().
-	Return -1 if there is no result yet.
+	Check last blast hit from parse_blast_id().
 	"""
-	finish_ids, re_check_ids, unfinished_ids = finish_and_unfinished_id()
+	finish_ids = parse_blast_id()
 	if len(finish_ids) > 0 :
 		finished_fasta = fasta_ids.index(finish_ids[-1])+1
 		print('Last hit: %s (at No.%d query)'% (finish_ids[-1], fasta_ids.index(finish_ids[-1])+1))
 		print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
 	else:
 		finished_fasta = 0
-		return -1
 
 def prepare_subfasta():
 	"""
