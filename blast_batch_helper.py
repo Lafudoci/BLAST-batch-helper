@@ -14,10 +14,12 @@ parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",requi
 parser.add_argument('-others', help="Pass other blast args.")
 args = parser.parse_args()
 
-version = '0.7.0'
+version = '0.7.1'
 
 fasta_file = args.query
 blast_output = args.out
+check_interval = 20
+nowtime = time.strftime('[%Y/%m/%d %H:%M:%S]')
 
 fasta_ids = []
 
@@ -103,7 +105,7 @@ def last_blast_result():
 	finish_ids = parse_blast_id()
 	if len(finish_ids) > 0 :
 		finished_fasta = fasta_ids.index(finish_ids[-1])+1
-		print('Last hit: %s (at No.%d query)'% (finish_ids[-1], fasta_ids.index(finish_ids[-1])+1))
+		print('Last hit: %s'% (finish_ids[-1]))
 		print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
 	else:
 		finished_fasta = 0
@@ -184,15 +186,17 @@ def blast_work(fasta_query):
 	write_timing_mark(blast_output)
 	blast_process = subprocess.Popen(blast_command, shell=True)
 	while (blast_process.poll()==None):
+		print('\n%s\nCheck BLAST status...'% nowtime)
 		extract_blast_output('tmp')
 		last_blast_result()
 		predict_finish_time()
-		print('BLASTing...\n')
-		time.sleep(20)
-	print('BLAST finished. Extracting final results.')
+		print('BLASTing...update in %d secs.'% check_interval)
+		time.sleep(check_interval)
+	print('\nBLAST finished. Extracting final results...')
 	extract_blast_output('final')	# extract the remaining hits after BLAST finish
 	write_ok_mark(blast_output)
 	clean_tmp_file(blast_output)
+	print('\n%s\nBLAST job is done.'% nowtime)
 
 def predict_finish_time():
 	timing_file = open(blast_output+'.timing', 'r')
@@ -218,7 +222,7 @@ def predict_finish_time():
 			time_remaining = num_wait_fasta / blast_speed_per_sec
 			time_finish = time.time() + time_remaining
 			print('Current BLASTing speed: %d seqs/hour.' % int(blast_speed_per_sec*3600))
-			print('Finish time is predicted: '+ str(time.asctime(time.localtime(time_finish))))
+			print('Finish time is predicted: '+ str(time.strftime('%Y/%m/%d %H:%M:%S',(time.localtime(time_finish)))))
 	else:
 		print('Not enough hit for finish time prediction')
 
@@ -248,9 +252,9 @@ def extract_blast_output(arg):
 						file.write(line)
 						file.close()
 				else:
-					print('ERROR: unknow arg of extract_blast_output: '+arg)
+					print('ERROR: unknown arg of extract_blast_output: '+arg)
 	else:
-		print('No BLAST output yet. Skipping extraction.')
+		print('No BLAST tmp yet. Skipping extraction.')
 
 def main():
 	print('\nBLAST-batch-helper v%s\n'%(version))
