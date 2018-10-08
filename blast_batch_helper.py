@@ -12,9 +12,10 @@ parser.add_argument('-gnu_parallel', help="Use GNU parallel.", action='store_tru
 parser.add_argument('-gnu_parallel_b', help="Set GNU parallel block size.", default= '100k', required=False)
 parser.add_argument('-gnu_parallel_j', help="Set GNU parallel job number.",required=False)
 parser.add_argument('-others', help="Pass other blast args.")
+parser.add_argument('-no_rollback', help="Ignore previous queries w/o hit in a resuming job.", action='store_true', required=False)
 args = parser.parse_args()
 
-version = '0.7.1'
+version = '0.7.2'
 
 fasta_file = args.query
 blast_output = args.out
@@ -130,20 +131,34 @@ def prepare_subfasta():
 		if os.path.exists(subfasta_file):
 			os.remove(subfasta_file)
 			print('Remove old duplicate subfasta file.')
-		
-		print('\nLast BLAST+ stopped at '+ start_id + '\nBut ALL query w/o hit before it will run BLAST again.\nGenerating subfasta file... It may take a while.\n')
-		subfile = False
-		with open (fasta_file, 'r') as f:
-			for line in f.readlines():
-				if line[0] == '>':
-					if line.split()[0][1:] in re_check_ids or line.split()[0][1:] in unfinished_ids:
-						subfile = True
-					else:
-						subfile = False
-				if subfile == True:
-					file = open(subfasta_file, 'a')
-					file.write(line)
-					file.close()
+		if args.no_rollback == False:
+			print('\nLast BLAST+ stopped at '+ start_id + '\nBut ALL query w/o hit before it will run BLAST again.\nGenerating subfasta file... It may take a while.\n')
+			subfile = False
+			with open (fasta_file, 'r') as f:
+				for line in f.readlines():
+					if line[0] == '>':
+						if line.split()[0][1:] in re_check_ids or line.split()[0][1:] in unfinished_ids:
+							subfile = True
+						else:
+							subfile = False
+					if subfile == True:
+						file = open(subfasta_file, 'a')
+						file.write(line)
+						file.close()
+		else:
+			print('\nno_rollback was set true.\nLast BLAST+ stopped at '+ start_id + '\nALL query w/o hit before it WILL BE IGNORED.\nGenerating subfasta file... It may take a while.\n')
+			subfile = False
+			with open (fasta_file, 'r') as f:
+				for line in f.readlines():
+					if line[0] == '>':
+						if line.split()[0][1:] in unfinished_ids:
+							subfile = True
+						else:
+							subfile = False
+					if subfile == True:
+						file = open(subfasta_file, 'a')
+						file.write(line)
+						file.close()
 		return 'id_' + start_id
 	else:
 		print('BLAST+ will start from origin fasta file')
