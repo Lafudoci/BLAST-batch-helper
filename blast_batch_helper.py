@@ -15,7 +15,7 @@ parser.add_argument('-others', help="Pass other blast args.")
 parser.add_argument('-no_rollback', help="Ignore previous queries w/o hit in a resuming job.", action='store_true', required=False)
 args = parser.parse_args()
 
-version = '0.7.3'
+version = '0.7.4'
 
 fasta_file = args.query
 blast_output = args.out
@@ -105,6 +105,7 @@ def last_blast_result():
 	finish_ids = parse_blast_id()
 	if len(finish_ids) > 0 :
 		finished_fasta = fasta_ids.index(finish_ids[-1])+1
+		print('Total hits: %d'% (len(finish_ids)))
 		print('Last hit: %s'% (finish_ids[-1]))
 		print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
 	else:
@@ -216,27 +217,24 @@ def predict_finish_time():
 	timing_file = open(blast_output+'.timing', 'r')
 	time_start = float(timing_file.read())
 	timing_file.close()
+	time_now = time.time()
 	if os.path.exists(blast_output+'.tmp'):
 		tmp_hit = parse_tmp_id()
 		tmp_hit_set = set(tmp_hit)
-		if len(tmp_hit_set) > 0:
+		if len(tmp_hit_set) >= 2:
 			tmp_index_set = set()
 			for hit in tmp_hit_set:
 				tmp_index_set.add(fasta_ids.index(hit))
 			num_finished_fasta = max(tmp_index_set)-min(tmp_index_set)+1
 			num_wait_fasta = len(fasta_ids) - max(tmp_index_set)
-			time_spent = time.time() - time_start
+			time_spent = time_now - time_start
 			blast_speed_per_sec = num_finished_fasta / time_spent
-		else:
-			num_finished_fasta = 0
-
-		if num_finished_fasta == 0:
-			print('Not enough hit for finish time prediction')
-		else:
 			time_remaining = num_wait_fasta / blast_speed_per_sec
-			time_finish = time.time() + time_remaining
+			time_finish = time_now + time_remaining
 			print('Current BLASTing speed: %d seqs/hour.' % int(blast_speed_per_sec*3600))
-			print('Finish time is predicted: '+ str(time.strftime('%Y/%m/%d %H:%M:%S',(time.localtime(time_finish)))))
+			print('Finish time prediction: '+ str(time.strftime('%Y/%m/%d %H:%M:%S',(time.localtime(time_finish)))))
+		else:
+			print('Not enough hit for finish time prediction')
 	else:
 		print('Not enough hit for finish time prediction')
 
