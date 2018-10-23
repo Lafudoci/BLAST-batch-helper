@@ -15,7 +15,7 @@ parser.add_argument('-others', help="Pass other blast args.")
 parser.add_argument('-no_rollback', help="Ignore previous queries w/o hit in a resuming job.", action='store_true', required=False)
 args = parser.parse_args()
 
-version = '0.7.4'
+version = '0.7.5'
 
 fasta_file = args.query
 blast_output = args.out
@@ -100,14 +100,15 @@ def parse_tmp_id():
 
 def last_blast_result():
 	"""
-	Check last blast hit from parse_blast_id().
+	Check last blast hit from parse_blast_id() and print finished percentage stats.
 	"""
 	finish_ids = parse_blast_id()
 	if len(finish_ids) > 0 :
+		all_fasta = len(fasta_ids)
 		finished_fasta = fasta_ids.index(finish_ids[-1])+1
-		print('Total hits: %d'% (len(finish_ids)))
+		print('Total hits: %d'% (all_fasta))
 		print('Last hit: %s'% (finish_ids[-1]))
-		print('Finished percentage: %.02f %% (%d/%d)' % (finished_fasta/len(fasta_ids)*100, finished_fasta, len(fasta_ids)))
+		print('Finished percentage: %.02f %% (%d/%d)' % (float(finished_fasta)/all_fasta*100, finished_fasta, all_fasta))
 	else:
 		finished_fasta = 0
 
